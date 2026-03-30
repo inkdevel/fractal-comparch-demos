@@ -9,7 +9,7 @@
  * force the CPU to deal with main RAM and TLB limits.
  */
 #define SIZE 8192   
-#define BLOCK 64    // A 64x64 block of floats is 16KB, fits easily in L1 Cache.
+#define BLOCK 8    // A 64x64 block of floats is 16KB, fits easily in L1 Cache.
 
 int main() {
     // Allocate two 256MB matrices in contiguous memory.
