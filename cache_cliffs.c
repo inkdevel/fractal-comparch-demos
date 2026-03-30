@@ -3,10 +3,37 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdint.h>
-#include <sched.h> // For CPU affinity (pinning to one core)
+
+// --- CROSS-PLATFORM AFFINITY HEADERS ---
+#ifdef __APPLE__
+    #include <mach/mach_types.h>
+    #include <mach/thread_act.h>
+    #include <mach/thread_policy.h>
+    #include <mach/mach_init.h>
+#else
+    #include <sched.h>
+#endif
 
 #define BILLION 1000000000L
-#define STEPS 20000000 // 20 million hops to average out noise
+#define STEPS 20000000 
+
+// Portable function to pin the current thread to a single core
+void pin_to_core() {
+#ifdef __APPLE__
+    // macOS logic: We use a "Thread Affinity Policy"
+    // Setting a tag (like 1) tells the OS to keep this thread on the same L2/L3 cache.
+    thread_affinity_policy_data_t policy = { 1 }; 
+    thread_port_t mach_thread = mach_thread_self();
+    thread_policy_set(mach_thread, THREAD_AFFINITY_POLICY, 
+                     (thread_policy_t)&policy, THREAD_AFFINITY_POLICY_COUNT);
+#else
+    // Linux logic: Pin specifically to Core 0
+    cpu_set_t set;
+    CPU_ZERO(&set);
+    CPU_SET(0, &set);
+    sched_setaffinity(0, sizeof(cpu_set_t), &set);
+#endif
+}
 
 /*
  * THE GOAL: Find the "Memory Wall."
