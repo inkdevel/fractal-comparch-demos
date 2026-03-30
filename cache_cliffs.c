@@ -103,10 +103,7 @@ void run_test(size_t size_bytes) {
 
 int main() {
     // PIN TO CORE 0: Avoids "Context Switching" noise.
-    cpu_set_t set;
-    CPU_ZERO(&set);
-    CPU_SET(0, &set);
-    sched_setaffinity(0, sizeof(cpu_set_t), &set);
+    pin_to_core();
 
     srand(time(NULL));
 
