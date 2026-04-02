@@ -8,9 +8,9 @@
 
 int main() {
     // 1. Setup: Allocate and initialize three large arrays
-    float *b = (float *)malloc(N * sizeof(float));
-    float *c = (float *)malloc(N * sizeof(float));
-    float *d = (float *)malloc(N * sizeof(float));
+    double *b = (double *)malloc(N * sizeof(double));
+    double *c = (double *)malloc(N * sizeof(double));
+    double *d = (double *)malloc(N * sizeof(double));
 
     for (int i = 0; i < N; i++) {
         b[i] = 1.1f; c[i] = 2.2f; d[i] = 3.3f;
@@ -23,10 +23,10 @@ int main() {
     // the previous one to complete to get the current value of 'a'.
     // This is a 'Read-After-Write' dependency that limits the CPU's IPC.
     double total_time_dep = 0;
-    float final_a_dep = 0;
+    double final_a_dep = 0;
 
     for (int run = 0; run < ITERATIONS; run++) {
-        float a = 0.0f;
+        double a = 0.0f;
         clock_t start = clock();
         for (int i = 0; i < N; i++) {
             a = a + b[i]; 
@@ -44,17 +44,17 @@ int main() {
     // independent, a modern superscalar CPU can perform the additions 
     // for all three in parallel within the same clock cycle.
     double total_time_indep = 0;
-    float final_a_indep = 0;
+    double final_a_indep = 0;
 
     for (int run = 0; run < ITERATIONS; run++) {
-        float a1 = 0.0f, a2 = 0.0f, a3 = 0.0f;
+        double a1 = 0.0f, a2 = 0.0f, a3 = 0.0f;
         clock_t start = clock();
         for (int i = 0; i < N; i++) {
             a1 += b[i]; // Independent of a2, a3
             a2 += c[i]; // Independent of a1, a3
             a3 += d[i]; // Independent of a1, a2
         }
-        float a = a1 + a2 + a3; // Recombine once at the end
+        double a = a1 + a2 + a3; // Recombine once at the end
         clock_t end = clock();
         total_time_indep += (double)(end - start) / CLOCKS_PER_SEC;
         final_a_indep = a;
